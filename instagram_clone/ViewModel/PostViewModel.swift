@@ -5,10 +5,11 @@
 //  Created by Projects on 12/10/20.
 //  View Model takes stress of computation from view
 
-import Foundation
+import Firebase
+import UIKit
 
 struct PostViewModel {
-    private let post: Post
+    var post: Post
     
     var imageURL : URL? {
         return URL(string: post.imageURL)
@@ -33,6 +34,21 @@ struct PostViewModel {
             return "\(post.likes) Like"
         }
     }
+    
+    var likeButtonImage: UIImage? {
+        let imageName = post.didLike ? "like_selected" : "like_unselected"
+        return UIImage(named: imageName)
+    }
+    
+    var likeButtonTintColor: UIColor {
+        
+        return post.didLike ? .red : .black
+    }
+    
+    var timeStamp: Timestamp {
+        return post.timestamp
+    }
+    
     init(post: Post) {
         self.post = post
     }

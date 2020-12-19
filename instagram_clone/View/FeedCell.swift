@@ -7,9 +7,19 @@
 
 import UIKit
 
+protocol FeedCellDelegate: class {
+    // This protocol is needed to activate commentController.
+    // Since FeedCell is oftype UICollectionViewCell, we cannot push this view into UINavigationController
+    // Delegate feed controller to use this function to push CommentController to UINavigationController
+    func cell(_ cell: FeedCell, wantsToShowCommentsFor post: Post)
+    func cell(_ cell: FeedCell, didLike post: Post)
+}
+
 class FeedCell : UICollectionViewCell {
 
     /// MARK: - Properties
+    
+    var delegate: FeedCellDelegate?
     
     var viewModel : PostViewModel? {
         didSet { configure() }
@@ -44,10 +54,11 @@ class FeedCell : UICollectionViewCell {
     }()
     
     // Like button
-    private lazy var likeButton : UIButton = {
+    lazy var likeButton : UIButton = {
         let button = UIButton(type: .system)
         button.setImage(#imageLiteral(resourceName: "like_unselected"), for: .normal)
         button.tintColor = .black
+        button.addTarget(self, action: #selector(didTapLike), for: .touchUpInside)
         return button
     }()
     
@@ -56,6 +67,7 @@ class FeedCell : UICollectionViewCell {
         let button = UIButton(type: .system)
         button.setImage(#imageLiteral(resourceName: "comment"), for: .normal)
         button.tintColor = .black
+        button.addTarget(self, action: #selector(didTapComments), for: .touchUpInside)
         return button
     }()
     
@@ -131,6 +143,16 @@ class FeedCell : UICollectionViewCell {
         print("did tap username")
     }
     
+    @objc func didTapComments() {
+        guard let viewModel = viewModel else { return }
+        delegate?.cell(self, wantsToShowCommentsFor: viewModel.post)
+    }
+    
+    @objc func didTapLike() {
+        guard let viewModel = viewModel else { return }
+        delegate?.cell(self, didLike: viewModel.post)   // delegate to FeedController
+    }
+    
     // MARK: - Helpers
     
     func configure() {
@@ -141,6 +163,8 @@ class FeedCell : UICollectionViewCell {
         profileImageView.sd_setImage(with: viewModel.userProfileImageURL)
         usernameButton.setTitle(viewModel.username, for: .normal)
         
+        likeButton.tintColor = viewModel.likeButtonTintColor
+        likeButton.setImage(viewModel.likeButtonImage, for: .normal)
     }
     
     func configureActionButtons() {

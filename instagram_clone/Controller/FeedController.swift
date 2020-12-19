@@ -24,7 +24,10 @@ class FeedController: UICollectionViewController {
     
 // MARK: - Properties
     
-    private var posts = [Post]()
+    private var posts = [Post]() {
+        didSet { collectionView.reloadData() }
+    }
+    var post: Post?
     
 // MARK: - Lifecycle
     
@@ -51,12 +54,28 @@ class FeedController: UICollectionViewController {
         }
     }
     
+    
+    @objc func handleRefresh() {
+        posts.removeAll()
+        fetchPosts()
+    }
 
 // MARK: - API
     func fetchPosts() {
         PostService.fetchPosts { posts in
             self.posts = posts
-            self.collectionView.reloadData()
+            self.collectionView.refreshControl?.endRefreshing()
+            self.checkIfUserLikedPosts()
+        }
+    }
+    
+    func checkIfUserLikedPosts(){
+        self.posts.forEach { (post) in
+            PostService.checkIfUserLikedPost(post: post) { (didLike) in
+                if let index = self.posts.firstIndex(where: { $0.postId == post.postId }) {
+                    self.posts[index].didLike = didLike
+                }
+            }
         }
     }
     
@@ -68,9 +87,14 @@ class FeedController: UICollectionViewController {
         // Must register cells to collection view
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(logout))
-        
+        if post == nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(logout))
+        }
         navigationItem.title = "Feed"
+        
+        let refresher = UIRefreshControl()
+        refresher.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        collectionView.refreshControl = refresher
     }
 }
 
@@ -79,15 +103,23 @@ class FeedController: UICollectionViewController {
 extension FeedController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // Number of items
-
-        return posts.count
+        
+        return post == nil ? posts.count : 1
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         // Defines each cell : Content, layout
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! FeedCell
-        cell.viewModel = PostViewModel(post: posts[indexPath.row])  // By setting viewModel, automatically runs didSet { configure() }
+        
+        // if post variable exists, only display one post else post all posts
+        if let post = post {
+            cell.viewModel = PostViewModel(post: post)
+        } else {
+            cell.viewModel = PostViewModel(post: posts[indexPath.row])  // By setting viewModel, automatically runs didSet { configure() }
+        }
+        
+        cell.delegate = self
         
         return cell
     }
@@ -104,4 +136,42 @@ extension FeedController : UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: height)
     }
     
+}
+
+
+// MARK: - FeedCellDelegate
+extension FeedController: FeedCellDelegate {
+    func cell(_ cell: FeedCell, wantsToShowCommentsFor post: Post) {
+        let controller = CommentController(post: post)
+        navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    func cell(_ cell: FeedCell, didLike post: Post) {
+        // Checking if the post is already liked
+        cell.viewModel?.post.didLike.toggle()
+        if post.didLike {
+            PostService.unlikePost(post: post) { (error) in
+                if let error = error {
+                    print("DEBUG: \(error.localizedDescription)")
+                    return
+                } else {
+                    cell.likeButton.setImage(#imageLiteral(resourceName: "like_unselected"), for: .normal)
+                    cell.likeButton.tintColor = .black
+                    cell.viewModel?.post.likes = post.likes - 1
+                }
+            }
+        } else {
+            PostService.likePost(post: post) { (error) in
+                if let error = error {
+                    print("DEBUG: \(error.localizedDescription)")
+                    return
+                } else {
+                
+                    cell.likeButton.setImage(#imageLiteral(resourceName: "like_selected"), for: .normal)
+                    cell.likeButton.tintColor = .red
+                    cell.viewModel?.post.likes = post.likes + 1
+                }
+            }
+        }
+    }
 }

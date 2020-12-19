@@ -14,7 +14,7 @@ class MainTabController : UITabBarController {
     
 // MARK: - Lifecycle
     
-    private var user: User? {
+    var user: User? {
         didSet {
             guard let user = user else { return }
             configureViewControllers(withUser: user)
@@ -46,7 +46,8 @@ class MainTabController : UITabBarController {
     }
     
     func fetchUser() {
-        UserService.fetchUser { user in
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        UserService.fetchUser(withUid: uid) { user in
             self.user = user
             self.navigationItem.title = user.username
         }
@@ -145,8 +146,17 @@ extension MainTabController: UITabBarControllerDelegate {
 }
 
 extension MainTabController: UploadPostControllerDelegate {
+    // This function is ran after didTapDoneButton from uploadPostController
     func controllerDidFinishUploadingPost(_ controller: UploadPostController) {
         selectedIndex = 0   // sets the currently selected tab bar index
         controller.dismiss(animated: true, completion: nil)
+        
+        // refresh feed controller after posting
+        // since FeedController is the root of UINavigationController, first get the UINavigationController
+        // holding the feed controller.
+        // Then, get the feed object from the UINavigationController stack as showen in the second guard
+        guard let feedNav = viewControllers?.first as? UINavigationController else { return }
+        guard let feed = feedNav.viewControllers.first as? FeedController else { return }
+        feed.handleRefresh()
     }
 }
