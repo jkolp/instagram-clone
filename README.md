@@ -31,7 +31,7 @@ More about the project :
 ![register](Documentation/register.png)
 ![register_filled](Documentation/register_filled.png)
 ![feed](Documentation/feed.png)
-![commetPage](Documentation/commetPage.png)
+![commentPage](Documentation/commentPage.png)
 ![userSearch](Documentation/userSearch.png)
 ![profile](Documentation/profile.png)
 ![notification](Documentation/notification.png)
