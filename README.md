@@ -24,7 +24,7 @@ All the core compoments of ready to be published Instagram features :
 * Modified MVVM Architecture
 * Backend using Cloud Firestore
 * Register and authenticate users using FirebaseAuth
-* Advanced Object Oriented Programming skills
+* Object Oriented Programming 
 * Used CocoaPods : Firebase, ActiveLabel, SDWebImage, JGProgressHUD, YPImagePicker
 
 ![login](Documentation/login.png)
