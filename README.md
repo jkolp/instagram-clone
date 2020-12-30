@@ -1,4 +1,4 @@
-<span style="font-size:4em"> Instagram Clone App </span>
+<span style="font-size:10em"> Instagram Clone App </span>
 
 All the core compoments of ready to be published Instagram features :
 
