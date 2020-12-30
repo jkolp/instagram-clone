@@ -1,4 +1,4 @@
-<span style="font-size:10em"> Instagram Clone App </span>
+# Instagram Clone App 
 
 All the core compoments of ready to be published Instagram features :
 
@@ -18,14 +18,14 @@ All the core compoments of ready to be published Instagram features :
 14. Logging in and logging out
 
 
-More about the project :
+## More about the project :
 
-- Advanced auto-layout and programmatic UI with Swift
-- Modified MVVM Architecture
-- Backend using Cloud Firestore
-- Register and authenticate users using FirebaseAuth
-- Advanced Object Oriented Programming skills
-- Used CocoaPods : Firebase, ActiveLabel, SDWebImage, JGProgressHUD, YPImagePicker
+* Advanced auto-layout and programmatic UI with Swift
+* Modified MVVM Architecture
+* Backend using Cloud Firestore
+* Register and authenticate users using FirebaseAuth
+* Advanced Object Oriented Programming skills
+* Used CocoaPods : Firebase, ActiveLabel, SDWebImage, JGProgressHUD, YPImagePicker
 
 ![login](Documentation/login.png)
 ![register](Documentation/register.png)
