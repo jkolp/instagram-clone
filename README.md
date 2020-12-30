@@ -20,7 +20,7 @@ All the core compoments of ready to be published Instagram features :
 
 ## More about the project :
 
-* Advanced auto-layout and programmatic UI with Swift
+* Auto-layout and programmatic UI with Swift
 * Modified MVVM Architecture
 * Backend using Cloud Firestore
 * Register and authenticate users using FirebaseAuth
