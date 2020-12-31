@@ -1,6 +1,6 @@
 # Instagram Clone App 
 
-All the core compoments of ready to be published Instagram features :
+All the core compoments of ready to be published Instagram features : 
 
 1. Create users
 2. Create a user profile
